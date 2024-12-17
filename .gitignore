@@ -19,3 +19,5 @@ builds/
 
 .cursorrules
 .env
+exported/obsidian-web-clipper-exported-types.json
+exported/obsidian-web-clipper-settings.json
