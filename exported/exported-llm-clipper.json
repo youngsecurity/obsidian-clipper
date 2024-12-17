@@ -2,7 +2,7 @@
 	"schemaVersion": "0.1.0",
 	"name": "LLM",
 	"behavior": "create",
-	"noteContentFormat": "## Summary\n\n{{prompt:\"a summary of the page\"}}\n\n{{content}}",
+	"noteContentFormat": "## Summary\n{{prompt:\"a summary of the page\"}}\n{{content}}",
 	"properties": [
 		{
 			"name": "title",
