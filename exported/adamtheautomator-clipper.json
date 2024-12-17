@@ -1,0 +1,43 @@
+{
+	"schemaVersion": "0.1.0",
+	"name": "https://adamtheautomator.com/",
+	"behavior": "create",
+	"noteContentFormat": "{{prompt:\"Format the website content as plain Markdown\"}}",
+	"properties": [
+		{
+			"name": "title",
+			"value": "{{title}}",
+			"type": "text"
+		},
+		{
+			"name": "source",
+			"value": "{{url}}",
+			"type": "text"
+		},
+		{
+			"name": "author",
+			"value": "{{author}}",
+			"type": "multitext"
+		},
+		{
+			"name": "created",
+			"value": "{{date}}",
+			"type": "date"
+		},
+		{
+			"name": "description",
+			"value": "{{description}}",
+			"type": "text"
+		},
+		{
+			"name": "tags",
+			"value": "clippings microsoft powershell",
+			"type": "multitext"
+		}
+	],
+	"triggers": [
+		"https://adamtheautomator.com/"
+	],
+	"noteNameFormat": "{{title}}",
+	"path": "microsoft/powershell"
+}
