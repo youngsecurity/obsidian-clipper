@@ -465,17 +465,29 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-
+	
 	turndownService.addRule('inlineFootnotes', {
 		filter: (node: Node): boolean => {
-			return node instanceof HTMLElement && 
-					node.nodeName === 'SPAN' && 
-					node.classList.contains('footnote-link');
+			return (
+				node instanceof HTMLElement &&
+				(
+				  (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) ||
+				  (node.nodeName === 'A' && node.classList.contains('citation'))
+				)
+			  );
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				const footnoteId = node.dataset.footnoteId;
-				const footnoteContent = node.dataset.footnoteContent;
+				let footnoteId = undefined;
+				let footnoteContent = undefined;
+
+				if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
+					footnoteId = node.dataset.footnoteId
+					footnoteContent = node.dataset.footnoteContent
+				} else if (node.nodeName === 'A' && node.classList.contains('citation')) {
+					footnoteId = node.textContent;
+					footnoteContent = node.getAttribute('href');
+				}
 				
 				if (footnoteId && footnoteContent) {
 					// Store the footnote content for later use
@@ -494,13 +506,16 @@ export function createMarkdownContent(content: string, url: string) {
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node: Node): boolean => {
-			if (node instanceof HTMLElement) {
+			if (node instanceof HTMLOListElement) {
 				return (
-					(node.nodeName === 'OL' && node.classList.contains('references')) ||
-					(node.nodeName === 'OL' && node.classList.contains('footnotes-list')) ||
-					(node.nodeName === 'UL' && node.classList.contains('ltx_biblist')) ||
-					(node.nodeName === 'OL' && node.parentElement?.classList?.contains('footnotes') === true)
+					node.classList.contains('references') ||
+					node.classList.contains('footnotes-list') ||
+					node.parentElement?.classList?.contains('footnote') === true ||
+					node.parentElement?.classList?.contains('footnotes') === true
 				);
+			}
+			if (node instanceof HTMLUListElement) {
+				return node.classList.contains('ltx_biblist')
 			}
 			return false;
 		},
@@ -836,6 +851,40 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
+	turndownService.addRule('katex', {
+		filter: (node) => {
+			return node instanceof HTMLElement && 
+				   (node.classList.contains('math') || node.classList.contains('katex'));
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Try to find the original LaTeX content
+			// 1. Check data-latex attribute
+			let latex = node.getAttribute('data-latex');
+			
+			// 2. If no data-latex, try to get from .katex-mathml
+			if (!latex) {
+				const mathml = node.querySelector('.katex-mathml annotation[encoding="application/x-tex"]');
+				latex = mathml?.textContent || '';
+			}
+
+			// 3. If still no content, use text content as fallback
+			if (!latex) {
+				latex = node.textContent?.trim() || '';
+			}
+
+			// Determine if it's an inline formula
+			const isInline = node.classList.contains('math-inline');
+			
+			if (isInline) {
+				return `$${latex}$`;
+			} else {
+				return `\n$$\n${latex}\n$$\n`;
+			}
+		}
+	});
+
 	function cleanupTableHTML(table: HTMLTableElement): string {
 		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
 		
@@ -884,7 +933,7 @@ export function createMarkdownContent(content: string, url: string) {
 				markdown += `[^${id}]: ${content}\n\n`;
 			}
 		}
-
+		
 		// Clear the footnotes object for the next conversion
 		Object.keys(footnotes).forEach(key => delete footnotes[key]);
 

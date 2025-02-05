@@ -23,6 +23,8 @@ import { length } from './filters/length';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
+import { merge } from './filters/merge';
+import { nth } from './filters/nth';
 import { number_format } from './filters/number_format';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
@@ -58,6 +60,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	capitalize,
 	date_modify,
 	date,
+	duration,
 	first,
 	footnote,
 	fragment_link,
@@ -72,7 +75,9 @@ export const filters: { [key: string]: FilterFunction } = {
 	lower,
 	map,
 	markdown,
+	merge,
 	number_format,
+	nth,
 	object,
 	pascal,
 	remove_attr,
@@ -97,8 +102,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	unescape,
 	unique,
 	upper,
-	wikilink,
-	duration
+	wikilink
 };
 
 // Split individual filters
