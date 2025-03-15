@@ -4,14 +4,10 @@
 node_modules/
 
 # Dev
-dev/
-dev_firefox/
-dev_safari/
+dev*/
 
 # Prod
-dist/
-dist_firefox/
-dist_safari/
+dist*/
 builds/
 assets/shared
 
@@ -20,3 +16,6 @@ assets/shared
 
 .cursorrules
 .env
+
+# Exported configs
+exported/
